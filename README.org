@@ -1,0 +1,3 @@
+* CBuild 
+
+CBuild is a Gradle-like build system for C/C++ projects, that compiles and executes a C program to build the project.
