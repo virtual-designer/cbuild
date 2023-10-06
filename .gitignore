@@ -1,0 +1,6 @@
+*.o
+.build_exec
+/build.c
+/tmp
+*~
+/cbuild
