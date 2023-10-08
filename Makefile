@@ -1,13 +1,18 @@
 CC = gcc
 GLOBAL_FLAGS = -g
 # CPPFLAFS = -DNDEBUG
-CFLAGS = $(GLOBAL_FLAGS) -Wall -Wextra -std=c11
-OBJECTS = $(patsubst %.c, %.o, $(wildcard src/*.c))
 BIN = cbuild
+SUBDIRS = lib src
 
-all: $(BIN)
-$(BIN): $(OBJECTS)
-	$(CC) -o $(BIN) $(GLOBAL_FLAGS) $(OBJECTS)
+all: subdirs
+	mv -f src/cbuild .
+
+subdirs:
+	@for d in $(SUBDIRS); do \
+		$(MAKE) -C $$d; \
+	done
+
 clean:
-	$(RM) $(OBJECTS)
-	$(RM) $(BIN)
+	@for d in $(SUBDIRS); do \
+		$(MAKE) -C $$d clean; \
+	done

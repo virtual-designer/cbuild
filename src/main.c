@@ -4,8 +4,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "log.h"
-#include "alloc.h"
+#include <cbuild/log.h>
+#include <cbuild/alloc.h>
 
 static char *progname = NULL;
 

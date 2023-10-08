@@ -10,13 +10,39 @@
 #include <errno.h>
 #include <libgen.h>
 #include <sys/wait.h>
+#include <cbuild/log.h>
+#include <cbuild/alloc.h>
 
 #include "build.h"
-#include "log.h"
-#include "alloc.h"
 
 #define BUILD_FILE_NAME "build.c"
 #define BUILD_EXEC_FILE_NAME ".build_exec"
+#define LIBCBUILD_PATH "/usr/lib/libcbuild.a"
+#define LIBCBUILD_PATH_ENVVAR "LIBCBUILD_PATH"
+#define INCLUDE_PATH_ENVVAR "CBUILD_INCLUDE_PATH"
+#define INCLUDE_PATH "/usr/include"
+
+static const char *
+get_libcbuild_path()
+{
+    const char *env = getenv(LIBCBUILD_PATH_ENVVAR);
+
+    if (env != NULL)
+	return env;
+
+    return LIBCBUILD_PATH;
+}
+
+static const char *
+get_include_path()
+{
+    const char *env = getenv(INCLUDE_PATH_ENVVAR);
+
+    if (env != NULL)
+	return env;
+
+    return INCLUDE_PATH;
+}
 
 char *
 build_file_path(char *dirpath, bool *failed)
@@ -53,14 +79,16 @@ build_file_path(char *dirpath, bool *failed)
 void
 compile_build_file(const char *filepath)
 {
-    log_info("Compiling build file: %s", filepath);
-    log_info("CC %s", basename(strdup(filepath)));
-
+    log_info("Compiling build file");
+    
     pid_t pid = fork();
 
     if (pid == 0) 
     {
-	exit(execlp("/usr/bin/gcc", "gcc", filepath, "-o", BUILD_EXEC_FILE_NAME, NULL));
+	exit(execlp("/usr/bin/gcc", "gcc", "-g",
+		    "-I", get_include_path(),
+		    filepath, get_libcbuild_path(),
+		    "-o", BUILD_EXEC_FILE_NAME, NULL));
     }
     else 
     {
@@ -118,7 +146,7 @@ remove_build_exec_file()
 {
     if (remove(BUILD_EXEC_FILE_NAME) != 0)
     {
-	log_warn("Failed to remove executable build file: %s", strerror(errno));
+	log_warn("Failed to remove compiled build file executable: %s", strerror(errno));
     }
 }
 
