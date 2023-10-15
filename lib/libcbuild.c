@@ -138,3 +138,48 @@ execute_v(void *start, ...)
 	}
     }
 }
+
+#define TARGET_MAX 512
+
+static target_t global_targets[TARGET_MAX] = { 0 };
+static size_t target_index = 0;
+
+static void
+target_add(target_t *target)
+{
+    global_targets[target_index++] = *target;
+}
+
+target_t
+target(const char *name, enum target_type type)
+{
+    target_t target = {
+	.type = type,
+	.name = strdup(name),
+	.sources = char_array_init(),
+	.cflags = char_array_init(),
+    };
+
+    target_add(&target);
+    return target;
+}
+
+void
+sources(const target_t *target, const char *file)
+{
+    char_array_push(target->sources, file);
+}
+ 
+void
+compile()
+{
+    (TARGETS_FN)();
+    
+    for (size_t i = 0; i < target_index; i++)
+    {
+	log_info("Target: %s", global_targets[i].name);
+
+	for (size_t j = 0; j < global_targets[i].sources->size; j++)
+	    log_info("Compile: %s", global_targets[i].sources->elements[j]);
+    }
+}

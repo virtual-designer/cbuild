@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g -Wall -Wextra
 CPPFLAGS = -I.. -I. -I../include
 LIBBUILD_OBJECTS = libbuild.o alloc.o log.o
-LIBCBUILD_OBJECTS = $(LIBBUILD_OBJECTS) libcbuild.o entry.o 
+LIBCBUILD_OBJECTS = $(LIBBUILD_OBJECTS) libcbuild.o entry.o array.o
 
 all: libbuild libcbuild
 
