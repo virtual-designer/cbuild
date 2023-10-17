@@ -9,6 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <libgen.h>
+#include <time.h>
 #include <sys/wait.h>
 #include <cbuild/log.h>
 #include <cbuild/alloc.h>
@@ -21,6 +22,13 @@
 #define LIBCBUILD_PATH_ENVVAR "LIBCBUILD_PATH"
 #define INCLUDE_PATH_ENVVAR "CBUILD_INCLUDE_PATH"
 #define INCLUDE_PATH "/usr/include"
+
+struct build_session_info 
+{
+    time_t start_time;
+};
+
+struct build_session_info g_info = { 0 };
 
 static const char *
 get_libcbuild_path()
@@ -174,11 +182,12 @@ start_build()
 void 
 prepare_build()
 {
-    
+    g_info.start_time = time(NULL);
 }
 
 void 
 end_build()
 {
-    log("\033[1;32mBUILD SUCCESSFUL\033[0m");
+    time_t end_time = time(NULL);
+    log("\033[1;32mBUILD SUCCESSFUL\033[0m in %lis", end_time - g_info.start_time);
 }

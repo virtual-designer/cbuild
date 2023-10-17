@@ -47,7 +47,8 @@ str_concat_dest(char **s1, const char *s2)
 int
 command(const char *restrict cmd)
 {
-    log_exec(cmd);
+    log_exec("%s", cmd);
+
     char **argv = NULL;
     size_t argc = 0;
 
@@ -89,7 +90,11 @@ command(const char *restrict cmd)
             log_error("Exit code of the last cmd is non-zero (%i). Aborting.", WIFEXITED(status));	    
             exit(-1);
         }
+
+        return WEXITSTATUS(status);
     }
+
+    return 0;
 }
 
 int
@@ -136,6 +141,8 @@ execute_v(void *start, ...)
             log_error("Exit code of the last command is non-zero (%i). Aborting.", WIFEXITED(status));	    
             exit(-1);
         }
+        
+        return WEXITSTATUS(status);
     }
 }
 
