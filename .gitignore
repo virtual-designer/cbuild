@@ -5,3 +5,4 @@
 *~
 /cbuild
 *.a
+/test

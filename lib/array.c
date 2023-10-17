@@ -16,7 +16,7 @@ char_array_free(char_array_t *array)
 {
     for (size_t i = 0; i < array->size; i++)
     {
-	free(array->elements[i]);
+	    free(array->elements[i]);
     }
 
     free(array->elements);

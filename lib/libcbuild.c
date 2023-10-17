@@ -25,10 +25,10 @@ str_concat(const char *s1, ...)
 
     while (sarg != NULL)
     {
-	len += strlen(sarg);
-	buf = xrealloc(buf, len);
-	strcat(buf, sarg);
-	sarg = va_arg(args, const char *);
+        len += strlen(sarg);
+        buf = xrealloc(buf, len);
+        strcat(buf, sarg);
+        sarg = va_arg(args, const char *);
     }
 	
     va_end(args);
@@ -54,20 +54,20 @@ command(const char *restrict cmd)
     for (size_t i = 0; i < strlen(cmd); i++)
     {
         char *arg = NULL;
-	size_t arglen = 0;
+        size_t arglen = 0;
+        
+        while (!isspace(cmd[i]))
+        {
+            arg = xrealloc(arg, ++arglen);
+            arg[arglen - 1] = cmd[i];
+            i++;
+        }
 	
-	while (!isspace(cmd[i]))
-	{
-	    arg = xrealloc(arg, ++arglen);
-	    arg[arglen - 1] = cmd[i];
-	    i++;
-	}
-	
-	arg = xrealloc(arg, ++arglen);
-	arg[arglen - 1] = 0;
+        arg = xrealloc(arg, ++arglen);
+        arg[arglen - 1] = 0;
 
-	argv = xrealloc(argv, sizeof (char *) * (++argc));
-	argv[argc - 1] = arg;
+        argv = xrealloc(argv, sizeof (char *) * (++argc));
+        argv[argc - 1] = arg;
     }
 
     argv = xrealloc(argv, sizeof (char *) * (++argc));
@@ -77,18 +77,18 @@ command(const char *restrict cmd)
 
     if (pid == 0)
     {
-	exit(execvp(argv[0], argv));
+	    exit(execvp(argv[0], argv));
     }
     else
     {
-	int status = 0;
-	wait(&status);
+        int status = 0;
+        wait(&status);
 
-	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-	{
-	    log_error("Exit code of the last cmd is non-zero (%i). Aborting.", WIFEXITED(status));	    
-	    exit(-1);
-	}
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+        {
+            log_error("Exit code of the last cmd is non-zero (%i). Aborting.", WIFEXITED(status));	    
+            exit(-1);
+        }
     }
 }
 
@@ -106,11 +106,11 @@ execute_v(void *start, ...)
     
     while (arg != NULL)
     {
-	argv = xrealloc(argv, sizeof (char *) * (++argc));
-	argv[argc - 1] = strdup(arg);
-	str_concat_dest(&command_str, argv[argc - 1]);
-	str_concat_dest(&command_str, " ");
-	arg = va_arg(args, char *);
+        argv = xrealloc(argv, sizeof (char *) * (++argc));
+        argv[argc - 1] = strdup(arg);
+        str_concat_dest(&command_str, argv[argc - 1]);
+        str_concat_dest(&command_str, " ");
+        arg = va_arg(args, char *);
     }
 
     argv = xrealloc(argv, sizeof (char *) * (++argc));
@@ -124,18 +124,18 @@ execute_v(void *start, ...)
 
     if (pid == 0)
     {
-	exit(execvp(argv[0], argv));
+	    exit(execvp(argv[0], argv));
     }
     else
     {
-	int status = 0;
-	wait(&status);
+        int status = 0;
+        wait(&status);
 
-	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-	{
-	    log_error("Exit code of the last command is non-zero (%i). Aborting.", WIFEXITED(status));	    
-	    exit(-1);
-	}
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+        {
+            log_error("Exit code of the last command is non-zero (%i). Aborting.", WIFEXITED(status));	    
+            exit(-1);
+        }
     }
 }
 
@@ -154,10 +154,10 @@ target_t
 target(const char *name, enum target_type type)
 {
     target_t target = {
-	.type = type,
-	.name = strdup(name),
-	.sources = char_array_init(),
-	.cflags = char_array_init(),
+        .type = type,
+        .name = strdup(name),
+        .sources = char_array_init(),
+        .cflags = char_array_init(),
     };
 
     target_add(&target);
@@ -177,9 +177,9 @@ compile()
     
     for (size_t i = 0; i < target_index; i++)
     {
-	log_info("Target: %s", global_targets[i].name);
+        log_info("Target: %s", global_targets[i].name);
 
-	for (size_t j = 0; j < global_targets[i].sources->size; j++)
-	    log_info("Compile: %s", global_targets[i].sources->elements[j]);
+        for (size_t j = 0; j < global_targets[i].sources->size; j++)
+            log_info("Compile: %s", global_targets[i].sources->elements[j]);
     }
 }

@@ -1,11 +1,11 @@
 #define _POSIX_C_SOURCE 1
 #define _GNU_SOURCE 1
-#define _BSD_SOURCE 1
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <cbuild/log.h>
 #include <cbuild/alloc.h>
+#include "build.h"
 
 static char *progname = NULL;
 
@@ -43,7 +43,9 @@ main(int argc, char **argv)
     if (argc != 1)
 	invalid_usage();
 
+    prepare_build();
     start_build();
-    log("\033[1;32mBUILD SUCCESSFUL\033[0m");
+    end_build();
+
     return 0;
 }

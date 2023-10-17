@@ -8,8 +8,8 @@ xmalloc(size_t size)
 
     if (ptr == NULL)
     {
-	perror("xmalloc");
-	exit(-1);
+        perror("xmalloc");
+        exit(-1);
     }
 
     return ptr;
@@ -22,8 +22,8 @@ xcalloc(size_t size, size_t n)
 
     if (ptr == NULL)
     {
-	perror("xcalloc");
-	exit(-1);
+        perror("xcalloc");
+        exit(-1);
     }
 
     return ptr;
@@ -36,8 +36,8 @@ xrealloc(void *ptr, size_t new_size)
 
     if (ret_ptr == NULL)
     {
-	perror("xrealloc");
-	exit(-1);
+        perror("xrealloc");
+        exit(-1);
     }
 
     return ret_ptr;

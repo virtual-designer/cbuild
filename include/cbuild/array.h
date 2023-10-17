@@ -8,8 +8,12 @@ typedef struct {
     size_t size;
 } char_array_t;
 
+__BEGIN_DECLS
+
 char_array_t *char_array_init();
 void char_array_push(char_array_t *, const char *);
 void char_array_free(char_array_t *);
+
+__END_DECLS
 
 #endif

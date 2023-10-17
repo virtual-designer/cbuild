@@ -10,7 +10,11 @@
 #define build void cbuild_build()
 #define targets void cbuild_targets()
 
+__BEGIN_DECLS
+
 extern build;
 extern targets;
+
+__END_DECLS
 
 #endif

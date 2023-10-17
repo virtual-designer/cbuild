@@ -28,7 +28,7 @@ get_libcbuild_path()
     const char *env = getenv(LIBCBUILD_PATH_ENVVAR);
 
     if (env != NULL)
-	return env;
+	    return env;
 
     return LIBCBUILD_PATH;
 }
@@ -39,7 +39,7 @@ get_include_path()
     const char *env = getenv(INCLUDE_PATH_ENVVAR);
 
     if (env != NULL)
-	return env;
+	    return env;
 
     return INCLUDE_PATH;
 }
@@ -50,9 +50,9 @@ build_file_path(char *dirpath, bool *failed)
     char curr_dir_buf[PATH_MAX];
 
     if (dirpath == NULL)
-	getcwd(curr_dir_buf, sizeof (curr_dir_buf));
+	    getcwd(curr_dir_buf, sizeof (curr_dir_buf));
     else
-	strcpy(curr_dir_buf, dirpath);
+	    strcpy(curr_dir_buf, dirpath);
 	
     char *fullpath = xmalloc(strlen(curr_dir_buf) + strlen(BUILD_FILE_NAME) + 2);
 
@@ -64,13 +64,11 @@ build_file_path(char *dirpath, bool *failed)
     FILE *file = fopen(fullpath, "r");
     
     if (file == NULL)
-    {
-	*failed = true;
-    }
+	    *failed = true;
     else
     {
-	*failed = false;
-	fclose(file);
+        *failed = false;
+        fclose(file);
     }
 
     return fullpath;
@@ -85,22 +83,22 @@ compile_build_file(const char *filepath)
 
     if (pid == 0) 
     {
-	exit(execlp("/usr/bin/gcc", "gcc", "-g",
-		    "-I", get_include_path(),
-		    filepath, get_libcbuild_path(),
-		    "-o", BUILD_EXEC_FILE_NAME, NULL));
+        exit(execlp("/usr/bin/gcc", "gcc", "-g",
+                "-I", get_include_path(),
+                filepath, get_libcbuild_path(),
+                "-o", BUILD_EXEC_FILE_NAME, NULL));
     }
     else 
     {
-	int status = 0;
-	
-	waitpid(pid, &status, 0);
-	
-	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) 
-	{
-	    log_error("Failed to compile build file");
-	    exit(-1);
-	}
+        int status = 0;
+        
+        waitpid(pid, &status, 0);
+        
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) 
+        {
+            log_error("Failed to compile build file");
+            exit(-1);
+        }
     }
 }
 
@@ -110,9 +108,9 @@ exec_build_file(char *dirpath)
     char curr_dir_buf[PATH_MAX];
 
     if (dirpath == NULL)
-	getcwd(curr_dir_buf, sizeof (curr_dir_buf));
+	    getcwd(curr_dir_buf, sizeof (curr_dir_buf));
     else
-	strcpy(curr_dir_buf, dirpath);
+	    strcpy(curr_dir_buf, dirpath);
 	
     char *fullpath = xmalloc(strlen(curr_dir_buf) + strlen(BUILD_EXEC_FILE_NAME) + 2);
 
@@ -125,19 +123,19 @@ exec_build_file(char *dirpath)
 
     if (pid == 0) 
     {
-	exit(execl(fullpath, basename(strdup(fullpath)), NULL));
+	    exit(execl(fullpath, basename(strdup(fullpath)), NULL));
     }
     else 
     {
-	int status = 0;
-	
-	waitpid(pid, &status, 0);
-	
-	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) 
-	{
-	    log_error("Failed to execute build file");
-	    exit(-1);
-	}
+        int status = 0;
+        
+        waitpid(pid, &status, 0);
+        
+        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) 
+        {
+            log_error("Failed to execute build file");
+            exit(-1);
+        }
     }
 }
 
@@ -146,7 +144,7 @@ remove_build_exec_file()
 {
     if (remove(BUILD_EXEC_FILE_NAME) != 0)
     {
-	log_warn("Failed to remove compiled build file executable: %s", strerror(errno));
+	    log_warn("Failed to remove compiled build file executable: %s", strerror(errno));
     }
 }
 
@@ -159,16 +157,28 @@ start_build()
     
     if (failed)
     {
-	if (errno == ENOENT)
-	    log_error("No build.c file found in the current directory!");
-	else
-	    log_error("Failed to open build.c file: %s", strerror(errno));
-	
-	exit(2);
+        if (errno == ENOENT)
+            log_error("No build.c file found in the current directory!");
+        else
+            log_error("Failed to open build.c file: %s", strerror(errno));
+        
+        exit(2);
     }
 
     log_info("Found build.c file: %s", fullpath);
     compile_build_file(fullpath);
     exec_build_file(NULL);
     remove_build_exec_file();
+}
+
+void 
+prepare_build()
+{
+    
+}
+
+void 
+end_build()
+{
+    log("\033[1;32mBUILD SUCCESSFUL\033[0m");
 }

@@ -19,10 +19,14 @@ typedef struct target
     char_array_t *cflags;
 } target_t;
 
+__BEGIN_DECLS
+
 int command(const char *restrict cmd);
 int execute_v(void *start, ...);
 void compile();
 target_t target(const char *, enum target_type);
 void sources(const target_t *, const char *);
+
+__END_DECLS
 
 #endif

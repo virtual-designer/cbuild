@@ -27,7 +27,11 @@ enum log_level
 #define log_exec(...) log_message(LOG_EXEC, __VA_ARGS__)
 #define log(...) log_message(LOG_GENERIC, __VA_ARGS__)
 
+__BEGIN_DECLS
+
 const char *log_level_to_str(enum log_level level);
 void __attribute__((format(printf, 2, 3))) log_message(enum log_level level, const char *fmt, ...);
+
+__END_DECLS
 
 #endif
