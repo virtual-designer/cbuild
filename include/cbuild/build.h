@@ -26,6 +26,7 @@ int execute_v(void *start, ...);
 void compile();
 target_t target(const char *, enum target_type);
 void sources(const target_t *, const char *);
+void cflags(const target_t *, const char *);
 
 __END_DECLS
 

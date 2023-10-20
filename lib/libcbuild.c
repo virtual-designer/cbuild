@@ -51,13 +51,14 @@ command(const char *restrict cmd)
 
     char **argv = NULL;
     size_t argc = 0;
-
-    for (size_t i = 0; i < strlen(cmd); i++)
+	size_t len = strlen(cmd);
+	
+    for (size_t i = 0; i < len; i++)
     {
         char *arg = NULL;
         size_t arglen = 0;
-        
-        while (!isspace(cmd[i]))
+
+		while (i < len && !isspace(cmd[i]))
         {
             arg = xrealloc(arg, ++arglen);
             arg[arglen - 1] = cmd[i];
@@ -176,6 +177,48 @@ sources(const target_t *target, const char *file)
 {
     char_array_push(target->sources, file);
 }
+
+static char *
+rpad(const char *src, size_t padding)
+{
+	size_t len = strlen(src);
+	char *str = xmalloc(len + padding + 1);
+	strncpy(str, src, len);
+	size_t index = len;
+	
+	while (--padding > 0)
+	{
+		str[index] = ' ';
+		index++;
+	}
+
+	str[index] = 0;
+	return str;
+}
+
+static char *
+pad_action_name(const char *action)
+{
+	static size_t max_action_len = 6;
+	size_t len = strlen(action);
+	size_t padding = max_action_len - len;
+	return rpad(action, padding);
+}
+
+#define ACTION(type, name, log)							\
+	do													\
+	{													\
+		char *padded = pad_action_name(name);			\
+		log_##type("\033[2m%s\033[0m %s", padded, log);	\
+		free(padded);									\
+	}													\
+	while (0);
+
+void
+cflags(const target_t *target, const char *flag)
+{
+	char_array_push(target->cflags, flag);
+}
  
 void
 compile()
@@ -184,9 +227,57 @@ compile()
     
     for (size_t i = 0; i < target_index; i++)
     {
-        log_info("Target: %s", global_targets[i].name);
-
+		const char *name = global_targets[i].name;
+        ACTION(info, "BUILD", name);
+		const char *target_cflags = char_array_to_str(global_targets[i].cflags);
+		char_array_t *objects = char_array_init();
+		
         for (size_t j = 0; j < global_targets[i].sources->size; j++)
-            log_info("Compile: %s", global_targets[i].sources->elements[j]);
+		{
+			char *source = global_targets[i].sources->elements[j];
+			char *cmd = xmalloc(4 + (2 * strlen(source)) + 4 + 4 + 1 + strlen(target_cflags) + 1);
+
+			ACTION(info, "CC", source);
+			
+			strcpy(cmd, "gcc ");
+			strcat(cmd, target_cflags);
+			strcat(cmd, " -c ");
+			strcat(cmd, source);
+			strcat(cmd, " -o ");
+
+			size_t len = strlen(source);
+			
+			for (size_t i = 0; i < len; i++)
+			{
+				if ((i + 1) < len && source[i] == '.')
+				{
+					source[i + 1] = 'o';
+					source[i + 2] = 0;
+				}
+			}
+
+			char_array_push(objects, strdup(source));
+
+			strcat(cmd, source);
+			
+			command(cmd);
+			free(cmd);
+		}
+
+		const char *objects_str = char_array_to_str(objects);
+		char *cmd = xmalloc(4 + strlen(objects_str) + 4 + strlen(name) + 2);
+
+		ACTION(info, "CCLD", name);
+		
+		strcpy(cmd, "gcc ");
+		strcat(cmd, objects_str);
+		strcat(cmd, " -o ");
+		strcat(cmd, name);
+		
+		command(cmd);
+		free(cmd);
+		
+		char_array_free(objects);
+		ACTION(info, "BUILT", global_targets[i].name);
     }
 }

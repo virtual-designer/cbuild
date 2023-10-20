@@ -11,6 +11,26 @@ char_array_init()
     return array;
 }
 
+char *
+char_array_to_str(const char_array_t *array)
+{
+	char *str = xmalloc(1);
+	strcpy(str, "");
+	size_t index = 0;
+	size_t prevsize = 1;
+
+	for (size_t i = 0; i < array->size; i++)
+	{
+		prevsize += strlen(array->elements[i] + ((i != array->size - 1) ? 1 : 0));
+		str = xrealloc(str, prevsize);
+		strcat(str, array->elements[i]);
+		strcat(str, " "); 
+	}
+
+	str[prevsize - 1] = 0;
+	return str;
+}
+
 void
 char_array_free(char_array_t *array)
 {
